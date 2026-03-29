@@ -6,6 +6,8 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator }
 import { useTheme } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'react-native';
+import { savePhoto } from '@/services/PhotoService';
+import { Platform } from 'react-native';
 
 const EXCHANGES = [
   { id: 'binance', name: 'Binance', color: '#F0B90B' },
@@ -23,12 +25,30 @@ export default function HomeScreen() {
 
   // Função para tirar foto
   async function takePicture() {
-    if (!camera) return;
+  if (!camera) return;
 
-    const result = await camera.takePictureAsync({ quality: 0.8 });
+  const result = await camera.takePictureAsync({
+    quality: 0.8,
+    base64: Platform.OS === 'web',
+  });
 
-    setPhoto(result.uri); // 👈 salva
+  if (Platform.OS === 'web') {
+
+    let uri = result.base64;
+
+    if (!uri) return;
+
+    // garante que não duplique o prefixo
+    if (!uri.startsWith('data:image')) {
+      uri = `data:image/jpg;base64,${uri}`;
+    }
+
+    setPhoto(uri);
+
+  } else {
+    setPhoto(result.uri);
   }
+}
 
   const handlePress = (exchange: any) => {
     router.push({
@@ -66,7 +86,7 @@ export default function HomeScreen() {
       />
 
       <FAB
-        icon="plus"
+        icon="camera-plus"
         color="white"
         style={{
           ...styles.fab,
@@ -81,11 +101,22 @@ export default function HomeScreen() {
           setShowCamera(true);
         }}
       />
+
+      <FAB
+        icon="image"
+        style={{
+          position: 'absolute',
+          right: 16,
+          bottom: 100,
+        }}
+        onPress={() => router.push('/photos')}
+      />
+
+
      {showCamera && (
-  <View style={StyleSheet.absoluteFillObject}>
+    <View style={StyleSheet.absoluteFillObject}>
 
     {photo ? (
-      // 📸 PREVIEW
       <>
         <Image source={{ uri: photo }} style={{ flex: 1 }} />
 
@@ -108,11 +139,14 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {
-              console.log('Foto confirmada:', photo);
-              setShowCamera(false);
-              setPhoto(null);
-            }}
+           onPress={async () => {
+            if (!photo) return;
+
+            await savePhoto(photo);
+
+            setShowCamera(false);
+            setPhoto(null);
+          }}
             style={{
               backgroundColor: 'green',
               padding: 15,
