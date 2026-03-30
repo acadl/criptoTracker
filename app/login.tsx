@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 import {
   SafeAreaView,
 } from 'react-native-safe-area-context';
@@ -23,7 +24,12 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  return <SafeAreaView style={styles.safeArea}>
+  return <SafeAreaView
+            style={[
+              styles.safeArea,
+              { backgroundColor: Platform.OS === 'ios' ? 'purple' : '#fff' }
+            ]}
+          >
             <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
               <View style={styles.container}>
               <View style={styles.logoContainer}>
@@ -37,6 +43,7 @@ export default function LoginScreen() {
                   style={styles.form}
               >
                 <TextInput 
+                  testID="email-input"
                   mode="flat"
                   keyboardType="email-address"
                   label="E-mail"
@@ -46,6 +53,7 @@ export default function LoginScreen() {
               </View>
               <View>
                 <TextInput
+                  testID="password-input"
                   onChangeText={(text: string) => setPassword(text)}
                   value={password}
                   mode="flat"
@@ -56,6 +64,7 @@ export default function LoginScreen() {
               </View>
               <View>
                 <Button
+                  testID="login-button"
                   style={styles.button}
                   mode="contained"
                   onPress={() => {

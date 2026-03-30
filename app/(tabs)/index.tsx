@@ -11,7 +11,7 @@ import { Platform } from 'react-native';
 
 const EXCHANGES = [
   { id: 'binance', name: 'Binance', color: '#F0B90B' },
-  { id: 'mercado_bitcoin', name: 'Mercado Bitcoin', color: '#FF6B00' },
+  { id: 'bybit', name: 'Bybit', color: '#FF6B00' },
 ];
 
 export default function HomeScreen() {
@@ -158,7 +158,7 @@ export default function HomeScreen() {
         </View>
       </>
     ) : (
-      // 📷 CÂMERA
+      //CÂMERA
       <>
         <CameraView
           ref={(ref) => setCamera(ref)}
@@ -252,4 +252,5 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  
 });
